@@ -6,4 +6,4 @@ export const GRAVITY = 600            // pixels/s², pulls player downward
 export const PLAYER_ACCELERATION = 600 // pixels/s², horizontal acceleration
 export const PLAYER_MAX_SPEED = 200    // pixels/s, max horizontal speed
 export const PLAYER_DRAG = 300         // pixels/s², deceleration when no input
-export const JUMP_VELOCITY = -480      // pixels/s, negative = upward (jump height ≈192px)
+export const JUMP_VELOCITY = -390      // pixels/s, negative = upward (jump height ≈128px)
