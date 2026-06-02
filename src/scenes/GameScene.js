@@ -31,6 +31,10 @@ export default class GameScene extends Phaser.Scene {
     this._combo = 0
     this._comboDeadline = 0
 
+    // Tap-to-restart (mobile)
+    this._tapRestart = false
+    this.input.on('pointerdown', () => { this._tapRestart = true })
+
     // Build terrain with tiled textures
     const groundTex = createGroundTexture(this)
     const platformTex = createPlatformTexture(this)
@@ -170,11 +174,12 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update() {
-    // Game Over or Win — wait for space to go to title
+    // Game Over or Win — wait for space/tap to go to title
     if (this.player.isDead() || this._won) {
-      if (this.cursors.space.isDown) {
+      if (this.cursors.space.isDown || this._tapRestart) {
         this.scene.start('TitleScene')
       }
+      this._tapRestart = false
       return
     }
 
@@ -423,9 +428,11 @@ export default class GameScene extends Phaser.Scene {
     const key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
     const handler = () => {
       key.removeListener('down', handler)
+      this.input.off('pointerdown', handler)
       cb()
     }
     key.on('down', handler)
+    this.input.on('pointerdown', handler)
   }
 
   _showWin() {
