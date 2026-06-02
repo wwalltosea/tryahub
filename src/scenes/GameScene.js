@@ -103,7 +103,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.input.on('pointerdown', (pointer) => {
       this._pointers.set(pointer.id, {
-        startX: pointer.x, startY: pointer.y, dir: 0,
+        startX: pointer.x, startY: pointer.y, dir: 0, jumped: false,
       })
     })
 
@@ -115,7 +115,10 @@ export default class GameScene extends Phaser.Scene {
       if (Math.abs(dx) >= Math.abs(dy) && Math.abs(dx) >= 20) {
         p.dir = dx > 0 ? 1 : -1
       }
-      if (dy <= -25) this._touchJump = true
+      if (dy <= -25 && !p.jumped) {
+        p.jumped = true
+        this._touchJump = true
+      }
     })
 
     this.input.on('pointerup', (pointer) => {
