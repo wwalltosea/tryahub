@@ -87,11 +87,37 @@ export default class GameScene extends Phaser.Scene {
       )
     })
 
-    // Input
+    // Input — keyboard
     this.cursors = this.input.keyboard.createCursorKeys()
     this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
     this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
     this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W)
+
+    // Input — touch (swipe-based)
+    this._touchDir = 0           // -1 left, 0 none, 1 right
+    this._touchJump = false      // true this frame → trigger jump
+    this._pointers = new Map()   // id → { startX, startY, dir }
+
+    this.input.on('pointerdown', (pointer) => {
+      this._pointers.set(pointer.id, {
+        startX: pointer.x, startY: pointer.y, dir: 0,
+      })
+    })
+
+    this.input.on('pointermove', (pointer) => {
+      const p = this._pointers.get(pointer.id)
+      if (!p) return
+      const dx = pointer.x - p.startX
+      const dy = pointer.y - p.startY
+      if (Math.abs(dx) >= Math.abs(dy) && Math.abs(dx) >= 20) {
+        p.dir = dx > 0 ? 1 : -1
+      }
+      if (dy <= -25) this._touchJump = true
+    })
+
+    this.input.on('pointerup', (pointer) => {
+      this._pointers.delete(pointer.id)
+    })
 
     // HUD (fixed to camera)
     this.hudScore = this.add.text(10, 10, 'SCORE: 0', {
@@ -114,6 +140,14 @@ export default class GameScene extends Phaser.Scene {
       fontSize: '40px', color: '#ffffff', fontFamily: 'Arial',
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(100)
 
+    // Portrait-mode hint (mobile only, hidden when landscape)
+    this._rotateHint = this.add.text(this.cameras.main.width / 2,
+      this.cameras.main.height / 2, '↻  请旋转手机  ↺', {
+        fontSize: '24px', color: '#ffffff', fontFamily: 'Arial',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        padding: { x: 20, y: 12 },
+      }).setOrigin(0.5).setScrollFactor(0).setDepth(200).setVisible(false)
+
     // Goal flag (white pole + red flag)
     const gx = level.goal.x
     const gy = level.goal.y
@@ -135,15 +169,27 @@ export default class GameScene extends Phaser.Scene {
       return
     }
 
+    // Portrait / landscape detection
+    const isPortrait = this.cameras.main.width < this.cameras.main.height
+    this._rotateHint.setVisible(isPortrait)
+
     this.player.update()
 
-    const left = this.cursors.left.isDown || this.keyA.isDown
-    const right = this.cursors.right.isDown || this.keyD.isDown
+    // Derive touch direction from active pointers
+    let touchDir = 0
+    for (const p of this._pointers.values()) {
+      if (p.dir !== 0) touchDir = p.dir
+    }
+    if (this._pointers.size === 0) touchDir = 0
+
+    const left  = this.cursors.left.isDown || this.keyA.isDown || touchDir === -1
+    const right = this.cursors.right.isDown || this.keyD.isDown || touchDir === 1
     this.player.move(left, right)
 
-    if (this.cursors.up.isDown || this.cursors.space.isDown || this.keyW.isDown) {
-      if (this.player.jump()) SFX.jump()
-    }
+    const wantJump = this.cursors.up.isDown || this.cursors.space.isDown ||
+                     this.keyW.isDown || this._touchJump
+    if (wantJump && this.player.jump()) SFX.jump()
+    this._touchJump = false
 
     // Combo timeout
     if (this._combo > 0 && this.time.now > this._comboDeadline) {
