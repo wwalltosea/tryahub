@@ -6,10 +6,8 @@ export function createGame(container) {
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     scale: {
-      mode: Phaser.Scale.FIT,
+      mode: Phaser.Scale.RESIZE,
       autoCenter: Phaser.Scale.CENTER_BOTH,
-      width: 960,
-      height: 540,
     },
     backgroundColor: '#1a1a2e',
     physics: {

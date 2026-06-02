@@ -140,13 +140,14 @@ export default class GameScene extends Phaser.Scene {
       fontSize: '40px', color: '#ffffff', fontFamily: 'Arial',
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(100)
 
-    // Portrait-mode hint (mobile only, hidden when landscape)
-    this._rotateHint = this.add.text(this.scale.width / 2,
-      this.scale.height / 2, '↻  请旋转手机  ↺', {
-        fontSize: '24px', color: '#ffffff', fontFamily: 'Arial',
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        padding: { x: 20, y: 12 },
-      }).setOrigin(0.5).setScrollFactor(0).setDepth(200).setVisible(false)
+    // Portrait-mode hint: dark background + text
+    const hx = this.cameras.main.width / 2
+    const hy = this.cameras.main.height / 2
+    this._rotateBg = this.add.rectangle(hx, hy, 280, 52, 0x000000, 0.6)
+      .setScrollFactor(0).setDepth(200).setVisible(false)
+    this._rotateHint = this.add.text(hx, hy, '↻  请旋转手机  ↺', {
+      fontSize: '22px', color: '#ffffff', fontFamily: 'Arial',
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setVisible(false)
 
     // Goal flag (white pole + red flag)
     const gx = level.goal.x
@@ -169,8 +170,9 @@ export default class GameScene extends Phaser.Scene {
       return
     }
 
-    // Portrait / landscape detection (use actual screen, not game canvas)
+    // Portrait / landscape detection (use actual screen)
     const isPortrait = window.innerWidth < window.innerHeight
+    this._rotateBg.setVisible(isPortrait)
     this._rotateHint.setVisible(isPortrait)
 
     this.player.update()
