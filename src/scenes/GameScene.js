@@ -133,11 +133,12 @@ export default class GameScene extends Phaser.Scene {
     this.hudLives = this.add.text(10, 64, 'LIVES: 3', {
       fontSize: '18px', color: '#ff4444', fontFamily: 'Arial',
     }).setScrollFactor(0).setDepth(100)
-    this.hudCombo = this.add.text(this.cameras.main.width / 2, 20, '', {
+    const comboY = Math.floor(this.cameras.main.height * 0.72)
+    this.hudCombo = this.add.text(this.cameras.main.width / 2, comboY, '', {
       fontSize: '40px', color: '#ff8800', fontFamily: 'Arial',
       fontStyle: 'bold',
     }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(100)
-    this.hudComboMult = this.add.text(this.cameras.main.width / 2, 66, '', {
+    this.hudComboMult = this.add.text(this.cameras.main.width / 2, comboY + 46, '', {
       fontSize: '28px', color: '#ff8800', fontFamily: 'Arial',
     }).setOrigin(0.5, 0).setScrollFactor(0).setDepth(100)
     this.hudTimer = this.add.text(this.cameras.main.width - 20, 10, '0.0s', {
@@ -164,12 +165,15 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.sprite, true, 0.1, 0.1)
     this.physics.world.setBounds(0, 0, level.width, level.height + 200)
 
-    // Reposition hint on resize
+    // Reposition UI elements on resize
     this.scale.on('resize', (gameSize) => {
       const cx = gameSize.width / 2
       const cy = gameSize.height / 2
       this._rotateBg.setPosition(cx, cy)
       this._rotateHint.setPosition(cx, cy - 2)
+      const comboY = Math.floor(gameSize.height * 0.72)
+      this.hudCombo.setPosition(cx, comboY)
+      this.hudComboMult.setPosition(cx, comboY + 46)
     })
   }
 
