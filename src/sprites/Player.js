@@ -3,6 +3,7 @@ import {
   PLAYER_MAX_SPEED,
   PLAYER_DRAG,
   JUMP_VELOCITY,
+  TOUCH_JUMP_VELOCITY,
 } from '../Physics.js'
 import { createPlayerTexture } from './PlayerTexture.js'
 
@@ -68,6 +69,13 @@ export class Player {
   jump() {
     if (!this._canJump) return false
     this.sprite.body.velocity.y = this._jumpVelocity
+    this._canJump = false
+    return true
+  }
+
+  touchJump() {
+    if (!this._canJump) return false
+    this.sprite.body.velocity.y = TOUCH_JUMP_VELOCITY
     this._canJump = false
     return true
   }

@@ -206,9 +206,10 @@ export default class GameScene extends Phaser.Scene {
     const right = this.cursors.right.isDown || this.keyD.isDown || touchDir === 1
     this.player.move(left, right)
 
-    const wantJump = this.cursors.up.isDown || this.cursors.space.isDown ||
-                     this.keyW.isDown || this._touchJump
-    if (wantJump && this.player.jump()) SFX.jump()
+    const keyJump = this.cursors.up.isDown || this.cursors.space.isDown ||
+                    this.keyW.isDown
+    if (keyJump && this.player.jump()) SFX.jump()
+    if (this._touchJump && this.player.touchJump()) SFX.jump()
     this._touchJump = false
 
     // Combo timeout
