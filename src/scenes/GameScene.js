@@ -32,8 +32,7 @@ export default class GameScene extends Phaser.Scene {
     this._comboDeadline = 0
 
     // Tap-to-restart (mobile)
-    this._tapRestart = false
-    this.input.on('pointerdown', () => { this._tapRestart = true })
+    this._restartReady = false
 
     // Build terrain with tiled textures
     const groundTex = createGroundTexture(this)
@@ -178,12 +177,11 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update() {
-    // Game Over or Win — wait for space/tap to go to title
+    // Game Over or Win — wait for space to go to title
     if (this.player.isDead() || this._won) {
-      if (this.cursors.space.isDown || this._tapRestart) {
+      if (this.cursors.space.isDown) {
         this.scene.start('TitleScene')
       }
-      this._tapRestart = false
       return
     }
 
@@ -301,6 +299,8 @@ export default class GameScene extends Phaser.Scene {
     if (this.player.isDead()) {
       SFX.death()
       this.physics.pause()
+      // Touch / space to restart
+      this.input.once('pointerdown', () => { this.scene.start('TitleScene') })
       // Hide normal HUD
       this.hudScore.setVisible(false)
       this.hudCoins.setVisible(false)
@@ -441,6 +441,7 @@ export default class GameScene extends Phaser.Scene {
 
   _showWin() {
     this.physics.pause()
+    this.input.once('pointerdown', () => { this.scene.start('TitleScene') })
     const w = this.cameras.main.width
     const h = this.cameras.main.height
     this.add.text(w / 2, h / 2 - 100, '恭喜通关！', {
