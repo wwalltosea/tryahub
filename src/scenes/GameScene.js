@@ -103,17 +103,10 @@ export default class GameScene extends Phaser.Scene {
 
     this.input.on('pointerdown', (pointer) => {
       this._pointers.set(pointer.id, {
+        ptr: pointer,             // Phaser pointer reference — updated each frame
         startX: pointer.x, startY: pointer.y,
-        curX: pointer.x, curY: pointer.y,
         dir: 0, jumped: false,
       })
-    })
-
-    this.input.on('pointermove', (pointer) => {
-      const p = this._pointers.get(pointer.id)
-      if (!p) return
-      p.curX = pointer.x
-      p.curY = pointer.y
     })
 
     this.input.on('pointerup', (pointer) => {
@@ -190,26 +183,21 @@ export default class GameScene extends Phaser.Scene {
 
     this.player.update()
 
-    // Process touch input — read pointer positions directly each frame
+    // Process touch input — read p.ptr.x/y from stored pointer references
     let touchDir = 0
-    const activePointers = this.input.manager.pointers.filter(p => p.active)
-    for (const pointer of activePointers) {
-      const p = this._pointers.get(pointer.id)
-      if (!p) continue
-      const dx = pointer.x - p.startX
-      const dy = pointer.y - p.startY
-      // Direction: horizontal swipe dominates
+    for (const p of this._pointers.values()) {
+      const dx = p.ptr.x - p.startX
+      const dy = p.ptr.y - p.startY
       if (Math.abs(dx) >= Math.abs(dy) && Math.abs(dx) >= 20) {
         p.dir = dx > 0 ? 1 : -1
       }
       if (p.dir !== 0) touchDir = p.dir
-      // Jump: upward swipe from ANY pointer
       if (dy <= -25 && !p.jumped) {
         p.jumped = true
         this._touchJump = true
       }
     }
-    if (activePointers.length === 0) touchDir = 0
+    if (this._pointers.size === 0) touchDir = 0
 
     const left  = this.cursors.left.isDown || this.keyA.isDown || touchDir === -1
     const right = this.cursors.right.isDown || this.keyD.isDown || touchDir === 1
