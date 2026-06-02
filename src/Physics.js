@@ -7,4 +7,4 @@ export const PLAYER_ACCELERATION = 600 // pixels/s², horizontal acceleration
 export const PLAYER_MAX_SPEED = 200    // pixels/s, max horizontal speed
 export const PLAYER_DRAG = 300         // pixels/s², deceleration when no input
 export const JUMP_VELOCITY = -390        // keyboard jump (≈128px)
-export const TOUCH_JUMP_VELOCITY = -350   // touch swipe jump (≈102px, easier to trigger)
+export const TOUCH_JUMP_VELOCITY = -310   // touch swipe jump (≈80px)
