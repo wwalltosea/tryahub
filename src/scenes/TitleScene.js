@@ -15,8 +15,8 @@ export default class TitleScene extends Phaser.Scene {
     // Rainbow title — 5 characters, each a different color
     const title = '几何马力欧'
     const colors = ['#ff0000', '#ff8800', '#ffdd00', '#00cc44', '#4488ff']
-    const fontSize = 96
-    const charWidth = fontSize + 8 // 中文字符宽度 ≈ 字体大小，加 8px 间隙
+    const fontSize = 72
+    const charWidth = fontSize + 6
     const totalW = title.length * charWidth
     let offsetX = w / 2 - totalW / 2 + charWidth / 2
     title.split('').forEach((char, i) => {
