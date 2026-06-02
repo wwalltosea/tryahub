@@ -32,8 +32,8 @@ export default class TitleScene extends Phaser.Scene {
       fontSize: '16px', color: '#888899', fontFamily: 'Arial',
     }).setOrigin(0.5)
 
-    // Blinking "Press SPACE" hint
-    const hint = this.add.text(w / 2, h / 2 + 100, '按空格键开始', {
+    // Blinking hint
+    const hint = this.add.text(w / 2, h / 2 + 100, '按空格键 / 点击屏幕开始', {
       fontSize: '20px', color: '#ffffff', fontFamily: 'Arial',
     }).setOrigin(0.5)
 
@@ -45,9 +45,11 @@ export default class TitleScene extends Phaser.Scene {
       repeat: -1,
     })
 
-    // Input
-    this.input.keyboard.once('keydown-SPACE', () => {
+    // Input — keyboard + touch
+    const startGame = () => {
       this.scene.start('GameScene', { levelId: 1 })
-    })
+    }
+    this.input.keyboard.once('keydown-SPACE', startGame)
+    this.input.once('pointerdown', startGame)
   }
 }

@@ -141,8 +141,8 @@ export default class GameScene extends Phaser.Scene {
     }).setOrigin(1, 0).setScrollFactor(0).setDepth(100)
 
     // Portrait-mode hint (mobile only, hidden when landscape)
-    this._rotateHint = this.add.text(this.cameras.main.width / 2,
-      this.cameras.main.height / 2, '↻  请旋转手机  ↺', {
+    this._rotateHint = this.add.text(this.scale.width / 2,
+      this.scale.height / 2, '↻  请旋转手机  ↺', {
         fontSize: '24px', color: '#ffffff', fontFamily: 'Arial',
         backgroundColor: 'rgba(0,0,0,0.6)',
         padding: { x: 20, y: 12 },
@@ -169,8 +169,8 @@ export default class GameScene extends Phaser.Scene {
       return
     }
 
-    // Portrait / landscape detection
-    const isPortrait = this.cameras.main.width < this.cameras.main.height
+    // Portrait / landscape detection (use actual screen, not game canvas)
+    const isPortrait = window.innerWidth < window.innerHeight
     this._rotateHint.setVisible(isPortrait)
 
     this.player.update()
