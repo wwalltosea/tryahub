@@ -99,26 +99,21 @@ export default class GameScene extends Phaser.Scene {
     // Input — touch (swipe-based)
     this._touchDir = 0           // -1 left, 0 none, 1 right
     this._touchJump = false      // true this frame → trigger jump
-    this._pointers = new Map()   // id → { startX, startY, dir }
+    this._pointers = new Map()   // id → { startX, startY, curX, curY, dir, jumped }
 
     this.input.on('pointerdown', (pointer) => {
       this._pointers.set(pointer.id, {
-        startX: pointer.x, startY: pointer.y, dir: 0, jumped: false,
+        startX: pointer.x, startY: pointer.y,
+        curX: pointer.x, curY: pointer.y,
+        dir: 0, jumped: false,
       })
     })
 
     this.input.on('pointermove', (pointer) => {
       const p = this._pointers.get(pointer.id)
       if (!p) return
-      const dx = pointer.x - p.startX
-      const dy = pointer.y - p.startY
-      if (Math.abs(dx) >= Math.abs(dy) && Math.abs(dx) >= 20) {
-        p.dir = dx > 0 ? 1 : -1
-      }
-      if (dy <= -25 && !p.jumped) {
-        p.jumped = true
-        this._touchJump = true
-      }
+      p.curX = pointer.x
+      p.curY = pointer.y
     })
 
     this.input.on('pointerup', (pointer) => {
@@ -195,10 +190,21 @@ export default class GameScene extends Phaser.Scene {
 
     this.player.update()
 
-    // Derive touch direction from active pointers
+    // Process touch input: direction + jump from all active pointers
     let touchDir = 0
     for (const p of this._pointers.values()) {
+      const dx = p.curX - p.startX
+      const dy = p.curY - p.startY
+      // Direction: horizontal swipe dominates
+      if (Math.abs(dx) >= Math.abs(dy) && Math.abs(dx) >= 20) {
+        p.dir = dx > 0 ? 1 : -1
+      }
       if (p.dir !== 0) touchDir = p.dir
+      // Jump: upward swipe from ANY pointer
+      if (dy <= -25 && !p.jumped) {
+        p.jumped = true
+        this._touchJump = true
+      }
     }
     if (this._pointers.size === 0) touchDir = 0
 
